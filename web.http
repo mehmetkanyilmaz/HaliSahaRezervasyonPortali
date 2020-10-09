@@ -1,0 +1,30 @@
+@BASE_URL = http://localhost:3000/api
+
+POST {{BASE_URL}}/user/addUser
+Content-Type: application/json
+
+{
+    "name" : "Emrehan",
+    "surname" : "Kanyılmaz",
+    "userName": "emrehan01",
+    "password": "emrehan54"
+}
+###
+POST {{BASE_URL}}/user/updateUser/5f71f3224283d623bc79f54d
+Content-Type: application/json
+{
+    "password": "emrehan55"
+}
+###
+GET {{BASE_URL}}/user/listAllUsers
+Content-Type: application/json
+###
+GET {{BASE_URL}}/user/listOneUser/5f5e354c1c21f81a304cf602
+Content-Type: application/json
+###
+POST {{BASE_URL}}/generalDefinitions/addRequestType
+Content-Type: application/json
+{
+    "requestName":"Telefon",
+    "requestColor":"#162534"
+}
