@@ -14,12 +14,20 @@ const userRouter = require('./routers/usersRouter');
 const generalDefinitionsRouter = require('./routers/generalDefinitionsRouter');
 const customerRouter = require('./routers/customerRouter');
 const deviceRouter=require('./routers/deviceRouter');
+const workmanshipRouter=require('./routers/workmanshipRouter');
+const accessoryRouter=require('./routers/accessoryRouter');
+const faultRouter=require('./routers/faultRouter');
+const otherExpenseRouter=require('./routers/otherExpenseRouter');
 
 //sayfa yönlendirme
 app.use('/api/user', userRouter);
 app.use('/api/generalDefinitions',generalDefinitionsRouter);
 app.use('/api/customer',customerRouter);
 app.use('/api/device',deviceRouter);
+app.use('/api/workmanship',workmanshipRouter);
+app.use('/api/accessory',accessoryRouter);
+app.use('/api/fault',faultRouter);
+app.use('/api/otherExpense',otherExpenseRouter);
 
 app.listen(3000, () =>{
     console.log("3000 portundan server başlatıldı.");
