@@ -17,11 +17,6 @@ const WorkmanshipSchema= new Schema({
         default:0.0,
         required:false 
     },
-    workmanshipHourlyWage:{//Saat başına artan ücret
-        type:Number,
-        default:0.0,
-        required:false 
-    },
     workmanshipExplanation:{//işçilik açıklaması
         type:String,
         required:false

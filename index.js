@@ -18,6 +18,7 @@ const workmanshipRouter=require('./routers/workmanshipRouter');
 const accessoryRouter=require('./routers/accessoryRouter');
 const faultRouter=require('./routers/faultRouter');
 const otherExpenseRouter=require('./routers/otherExpenseRouter');
+const workOrderRouter=require('./routers/workOrderRouter');
 
 //sayfa yönlendirme
 app.use('/api/user', userRouter);
@@ -28,6 +29,7 @@ app.use('/api/workmanship',workmanshipRouter);
 app.use('/api/accessory',accessoryRouter);
 app.use('/api/fault',faultRouter);
 app.use('/api/otherExpense',otherExpenseRouter);
+app.use('/api/workOrder',workOrderRouter);
 
 app.listen(3000, () =>{
     console.log("3000 portundan server başlatıldı.");

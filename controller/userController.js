@@ -30,16 +30,26 @@ const listAllUsers=async(req,res)=>{
     }
     catch(err){  res.status(404).json({"message":err});}
 }
-const listOneUser=async(res,req)=>{
+const listOneUser=async(req,res)=>{
     try{
         const oneUser= await User.findById({_id:req.params.id});
         return res.status(200).json(oneUser);
     }
-    catch(err){ res.status(404).json({"message":err});}
+    catch(err){ res.status(404).json({"msg":err});}
 }
+const login=async(req,res)=>{
+    try{
+        const user=await User.find({userName:req.body.userName,password:req.body.password});
+        if(user.length>0) res.status(200).json({msg:"true"});
+        else res.status(400).json({msg:"false"});
+    }
+    catch(err){ res.status(404).json({"msg":err});}
+}
+
 module.exports={
     addUser,
     updateUser,
     listAllUsers,
-    listOneUser
+    listOneUser,
+    login
 }
