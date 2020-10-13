@@ -42,6 +42,7 @@ const login=async(req,res)=>{
         const user=await User.find({userName:req.body.userName,password:req.body.password});
         if(user.length>0) res.status(200).json({msg:"true"});
         else res.status(400).json({msg:"false"});
+        
     }
     catch(err){ res.status(404).json({"msg":err});}
 }
