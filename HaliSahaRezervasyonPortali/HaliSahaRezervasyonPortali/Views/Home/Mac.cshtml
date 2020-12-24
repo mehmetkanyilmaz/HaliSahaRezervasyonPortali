@@ -1,0 +1,237 @@
+﻿@model IEnumerable<HaliSahaRezervasyonPortali.Models.ViewsModel.matchUserViewModel>
+
+@{
+    ViewBag.Title = "Mac";
+}
+@*Bu sayfadaki maç ile ilgili kodlar Script klasörünün altındaki custom2.js dosyası içindedir.*@
+<script type="text/javascript">
+    document.getElementById("li1").className = "";
+    document.getElementById("li2").className = "active";
+    document.getElementById("li3").className = "";
+    function Logout() {
+        $.ajax({
+            url: '/Home/Logout/',
+            type: "Post",
+            dataType: 'json',
+            async: false,
+            success: function (gelenDeg) {
+                if (gelenDeg == "200") {
+                    window.location = "/Home/Index";
+                }
+                else {
+
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+</script>
+<style>
+    /*body {
+        font-family: Arial;
+        font-size: 17px;
+        padding: 8px;
+    }*/
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .row {
+        display: -ms-flexbox; /* IE10 */
+        display: flex;
+        -ms-flex-wrap: wrap; /* IE10 */
+        flex-wrap: wrap;
+        margin: 0 -16px;
+    }
+
+    .col-25 {
+        -ms-flex: 25%; /* IE10 */
+        flex: 25%;
+    }
+
+    .col-50 {
+        -ms-flex: 50%; /* IE10 */
+        flex: 50%;
+    }
+
+    .col-75 {
+        -ms-flex: 75%; /* IE10 */
+        flex: 75%;
+    }
+
+    .col-25,
+    .col-50,
+    .col-75 {
+        padding: 0 16px;
+    }
+
+    /*.container {
+        background-color: #f2f2f2;
+        padding: 5px 20px 15px 20px;
+        border: 1px solid lightgrey;
+        border-radius: 3px;
+    }*/
+
+    input[type=text] {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    input[type=password] {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    label {
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .icon-container {
+        margin-bottom: 20px;
+        padding: 7px 0;
+        font-size: 24px;
+    }
+
+    /*.btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px;
+        margin: 10px 0;
+        border: none;
+        width: 100%;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 17px;
+    }*/
+
+    /* .btn:hover {
+            background-color: #45a049;
+        }*/
+
+    /* a {
+        color: #2196F3;
+    }*/
+
+    /*hr {
+        border: 1px solid lightgrey;
+    }*/
+
+    span.price {
+        float: right;
+        color: grey;
+    }
+</style>
+<h2>Rezervasyon Geçmişiniz</h2>
+<table id="tblMacGecmisi" class="table table-bordered">
+    <thead>
+        <tr>
+            <td>Tarih</td>
+            <td>Saat</td>
+            <td>Stad</td>
+            <td>Not</td>
+            <td>Servis</td>
+            <td>Toplam Ücret</td>
+            <td>Değiştir</td>
+            <td>İptal</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Convert.ToDateTime(item.matchDate).ToShortDateString()</td>
+                <td>@(item.matchStart+" - "+item.matchStop)</td>
+                <td>@item.stad.stadiumName</td>
+                <td>@(item.note==null ? "Not bırakılmamış.":item.note)</td>
+                <td>
+                    @if (item.service)
+                    {
+                        <span class="glyphicon glyphicon-ok"></span>
+                    }
+                    else
+                    {
+                        <span class="glyphicon glyphicon-remove"></span>
+                    }
+                </td>
+                <td>@(item.totalPrice +" TL")</td>
+                <td>
+                    <a class="btn btn-info btn-block btnRezervasyonGuncelle" data-toggle="modal" data-target="#rezervasyonGuncelleModal" data-tarih="@Convert.ToDateTime(item.matchDate).ToShortDateString()" data-id="@item._id"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+                </td>
+                <td>
+                    <a class="btn btn-danger btn-block btnRezervasyonSil" data-date="@item.matchDate" data-id="@item._id"><span class="glyphicon glyphicon-trash"></span></a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@*-------------------Rezervasyon Güncelleme Modal-------------------*@
+<div class="modal fade" id="rezervasyonGuncelleModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Rezervasyon Güncelleme İşlemi</h4>
+            </div>
+            <div class="modal-body">
+                @*----------------------Rezervasyon Güncelleme Sayfası Kodları------------*@
+                <div class="row">
+                    <div class="container">
+                        <form>
+                            <div class="row">
+                                <div class="col-50">
+                                    <input type="date" id="dateTime2" class="form-control">
+                                    <br />
+                                    <select class="form-control" id="matchTime">
+                                        <option value="00:00-01:00">00:00 - 01:00</option>
+                                        <option value="01:00-02:00">01:00 - 02:00</option>
+                                        <option value="02:00-03:00">02:00 - 03:00</option>
+                                        <option value="03:00-04:00">03:00 - 04:00</option>
+                                        <option value="04:00-05:00">04:00 - 05:00</option>
+                                        <option value="05:00-06:00">05:00 - 06:00</option>
+                                        <option value="06:00-07:00">06:00 - 07:00</option>
+                                        <option value="07:00-08:00">07:00 - 08:00</option>
+                                        <option value="08:00-09:00">08:00 - 09:00</option>
+                                        <option value="09:00-10:00">09:00 - 10:00</option>
+                                        <option value="10:00-11:00">10:00 - 11:00</option>
+                                        <option value="11:00-12:00">11:00 - 12:00</option>
+                                        <option value="12:00-13:00">12:00 - 13:00</option>
+                                        <option value="13:00-14:00">13:00 - 14:00</option>
+                                        <option value="14:00-15:00">14:00 - 15:00</option>
+                                        <option value="15:00-16:00">15:00 - 16:00</option>
+                                        <option value="16:00-17:00">16:00 - 17:00</option>
+                                        <option value="17:00-18:00">17:00 - 18:00</option>
+                                        <option value="18:00-19:00">18:00 - 19:00</option>
+                                        <option value="19:00-20:00">19:00 - 20:00</option>
+                                        <option value="20:00-21:00">20:00 - 21:00</option>
+                                        <option value="21:00-22:00">21:00 - 22:00</option>
+                                        <option value="22:00-23:00">22:00 - 23:00</option>
+                                        <option value="23:00-00:00">23:00 - 00:00</option>
+                                    </select>
+                                    <br />
+                                    <select class="form-control" id="matchStad">
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                @*--------------------End Rezervasyon Güncelleme Sayfası Kodları----------------------*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btnbtn" id="btnMacGuncelle">Değiştir</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+@*-------------------End Rezervasyon Güncelleme Modal-------------------*@

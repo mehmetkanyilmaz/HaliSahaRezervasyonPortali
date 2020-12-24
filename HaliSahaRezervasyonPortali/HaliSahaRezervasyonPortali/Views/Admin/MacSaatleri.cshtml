@@ -1,0 +1,41 @@
+﻿@model IEnumerable<HaliSahaRezervasyonPortali.Models.matchTimeModel>
+@{
+    ViewBag.Title = "MacSaatleri";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int i = 0;
+}
+@*Bu sayfadaki güncelleme ile ilgili kodlar Script klasörünün altındaki custom.js dosyası içindedir.*@
+<script type="text/javascript">
+    document.getElementById("li1").className = "";
+    document.getElementById("li2").className = "";
+    document.getElementById("li3").className = "active";
+    document.getElementById("li4").className = "";
+</script>
+<br />
+<table id="tblMacSaatleri" class="table table-bordered">
+    <thead>
+        <tr>
+            <td>Başlangıç</td>
+            <td>Bitiş</td>
+            <td>Maç Ücreti</td>
+            <td>Servis Ücreti</td>
+            <td>Durum</td>
+            <td>Güncelle</td>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.startTime</td>
+                <td>@item.stopTime</td>
+                <td>@Html.TextBoxFor(m => m.ToList()[i].matchPrice, new { @class = "form-control", id = "tbxMatch" + item._id })</td>
+                <td>@Html.TextBoxFor(m => m.ToList()[i].servicePrice, new { @class = "form-control", id = "tbxService" + item._id })</td>
+                <td>@Html.DropDownListFor(m => m.ToList()[i].status, new SelectList(new[] { new KeyValuePair<string, string>("Açık", "true"), new KeyValuePair<string, string>("Kapalı", "false") }, "Value", "Key", item.status), new { @class = "form-control", id = "drpStatus" + item._id })</td>
+                <td><a class="btn btn-info btn-block btnKaydet" data-val1="@item.startTime" data-val2="@item.stopTime" data-id="@item._id"><span class="glyphicon glyphicon-floppy-saved"></span></a></td>
+            </tr>
+            i++;
+        }
+    </tbody>
+</table>

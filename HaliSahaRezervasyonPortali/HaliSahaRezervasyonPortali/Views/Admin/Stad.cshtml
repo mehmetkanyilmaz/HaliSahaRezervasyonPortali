@@ -1,0 +1,53 @@
+﻿@model IEnumerable<HaliSahaRezervasyonPortali.Models.stadiumModel>
+@{
+    ViewBag.Title = "Stad";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int i = 0;
+}
+@*Bu sayfadaki stad ile ilgili kodlar Script klasörünün altındaki custom.js dosyası içindedir.*@
+<script type="text/javascript">
+    document.getElementById("li1").className = "";
+    document.getElementById("li2").className = "";
+    document.getElementById("li3").className = "";
+    document.getElementById("li4").className = "active";
+</script>
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-lg-2 table-bordered" style="border-radius:15px;" id="ekleDiv">
+            <h4>Yeni Stad Oluştur</h4><br />
+            <input type="text" class="form-control" id="tbxStadN" placeholder="Stad Adı" /><br />
+            <select id="drpS" class="form-control">
+                <option value="true">Açık</option>
+                <option value="false">Kapalı</option>
+            </select><br />
+            <a class="btn btn-success btn-block btnStadEkle"><span class="glyphicon glyphicon-plus-sign"></span></a>
+            <br />
+        </div>
+        <div class="col-lg-10">
+            <table id="tblStadlar" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <td>Stad Adı</td>
+                        <td>Stad Durumu</td>
+                        <td>Güncelle</td>
+                        <td>Sil</td>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.TextBoxFor(m => m.ToList()[i].stadiumName, new { @class = "form-control", id = "tbxStadName" + item._id })</td>
+                            <td>@Html.DropDownListFor(m => m.ToList()[i].stadStatus, new SelectList(new[] { new KeyValuePair<string, string>("Açık", "true"), new KeyValuePair<string, string>("Kapalı", "false") }, "Value", "Key", item.stadStatus), new { @class = "form-control", id = "drpStatus" + item._id })</td>
+                            <td><a class="btn btn-info btn-block btnStadGuncelle" data-id="@item._id"><span class="glyphicon glyphicon-floppy-saved"></span></a></td>
+                            <td><a class="btn btn-danger btn-block btnStadSil" data-id="@item._id"><span class="glyphicon glyphicon-trash"></span></a></td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

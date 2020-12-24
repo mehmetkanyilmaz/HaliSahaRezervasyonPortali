@@ -1,0 +1,108 @@
+﻿@model IList<HaliSahaRezervasyonPortali.Models.ViewsModel.matchUserViewModel>
+@{
+    ViewBag.Title = "MacListesi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@*Bu sayfadaki silme ile ilgili kodlar Script klasörünün altındaki custom.js dosyası içindedir.*@
+<script type="text/javascript">
+    document.getElementById("li1").className = "";
+    document.getElementById("li2").className = "active";
+    document.getElementById("li3").className = "";
+    document.getElementById("li4").className = "";
+</script>
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .row {
+        display: -ms-flexbox; /* IE10 */
+        display: flex;
+        -ms-flex-wrap: wrap; /* IE10 */
+        flex-wrap: wrap;
+        margin: 0 -16px;
+    }
+
+    span.price {
+        float: right;
+        color: grey;
+    }
+</style>
+<br />
+<table id="tblMaclar" class="table table-bordered">
+    <thead>
+        <tr>
+            <td>Müşteri</td>
+            <td>İletişim</td>
+            <td>Tarih</td>
+            <td>Gün</td>
+            <td>Saat</td>
+            <td>Stad</td>
+            <td>Servis</td>
+            <td>Detay</td>
+            <td>Sil</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.user.nameAndSurname</td>
+                <td>@item.user.phoneNumber</td>
+                <td>@Convert.ToDateTime(item.matchDate).ToShortDateString()</td>
+                <td>@Convert.ToDateTime(item.matchDate).DayOfWeek.ToString()</td>
+                <td>@item.matchStart - @item.matchStop</td>
+                <td>@item.stad.stadiumName</td>
+                <td>
+                    @if (item.service)
+                    {
+                        <span class="glyphicon glyphicon-ok"></span>
+                    }
+                    else
+                    {
+                        <span class="glyphicon glyphicon-remove"></span>
+                    }
+                            </td>
+                <td><a class="btn btn-success btn-block btnDetay" data-id="@item._id" data-toggle="modal" data-target="#detayModal"><span class="glyphicon glyphicon-folder-open"></span></a></td>
+                <td><a class="btn btn-danger btn-block btnSil" data-id="@item._id"><span class="glyphicon glyphicon-trash"></span></a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+@*---------------------------Detay Modal-----------------------------------*@
+<div class="modal fade" id="detayModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Rezervasyon Detayları</h4>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <h4>Müşteri Bilgileri;</h4>
+                            <div id="lblMusteri" class="col-md-12 col-xs-12"></div>
+                            <div id="lblTelefon" class="col-md-12 col-xs-12"></div>
+                            <div id="lblEMail" class="col-md-12 col-xs-12"></div>
+                    </div>
+                    <div class="row">
+                        <h4>Maç Bilgileri;</h4>
+                        <div id="lblTarih" class="col-md-12 col-xs-12"></div>
+                        <div id="lblSaat" class="col-md-12 col-xs-12"></div>
+                        <div id="lblNot" class="col-md-12 col-xs-12" style="word-wrap: break-word;"></div>
+                        <div id="lblServis" class="col-md-12 col-xs-12"></div>
+                    </div>
+                    <div class="row">
+                        <h4>Stad Bilgileri;</h4>
+                        <div id="lblStad" class="col-md-12 col-xs-12"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+@*---------------------------End Detay Modal------------------------*@

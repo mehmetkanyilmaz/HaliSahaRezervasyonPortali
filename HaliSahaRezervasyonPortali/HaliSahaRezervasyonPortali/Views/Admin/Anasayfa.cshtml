@@ -1,0 +1,106 @@
+﻿@*Bu sayfadaki analiz ileri bir tarihte yapılması planlanmaktadır.*@
+@{
+    ViewBag.Title = "Anasayfa";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<link href="~/Content/css2/style.css" rel="stylesheet" />
+<link href="~/Content/css2/style_grid.css" rel="stylesheet" />
+<script type="text/javascript">
+    document.getElementById("li1").className = "active";
+    document.getElementById("li2").className = "";
+    document.getElementById("li3").className = "";
+    document.getElementById("li4").className = "";
+</script>
+<style>
+    .row div {
+        height: 150px;
+        margin: 30px;
+        padding: 10px;
+        border-radius: 15px;
+    }
+</style>
+<div class="well">
+    <ul class="ca-menu">
+        <li>
+            <a href="#">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main one">6,813</h4>
+                    <h3 class="ca-sub one">Toplam Kullanıcı</h3>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="fa fa-flag-checkered" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main">20,440</h4>
+                    <h3 class="ca-sub">Toplam Maç</h3>
+                </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="#">
+                <i class="fa fa-futbol-o" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main two">28</h4>
+                    <h3 class="ca-sub two">Günlük Maç</h3>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="fa fa-tasks" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main three">4</h4>
+                    <h3 class="ca-sub three">Toplam Stad</h3>
+                </div>
+            </a>
+        </li>
+
+        <div class="clearfix"></div>
+    </ul>
+
+    <ul class="ca-menu">
+        <li>
+            <a href="#">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main one">Cumartesi</h4>
+                    <h3 class="ca-sub one">Trend Gün</h3>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="fa fa-clock-o" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main">23:00 - 00:00</h4>
+                    <h3 class="ca-sub">Trend Saat</h3>
+                </div>
+            </a>
+        </li>
+
+        <li>
+            <a href="#">
+                <i class="glyphicon glyphicon-th" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main two">Yeşil Stad</h4>
+                    <h3 class="ca-sub two">Trend Stad</h3>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#">
+                <i class="fa fa-bus" aria-hidden="true"></i>
+                <div class="ca-content">
+                    <h4 class="ca-main three">11,242</h4>
+                    <h3 class="ca-sub three">Toplam Servis</h3>
+                </div>
+            </a>
+        </li>
+
+        <div class="clearfix"></div>
+    </ul>
+</div>

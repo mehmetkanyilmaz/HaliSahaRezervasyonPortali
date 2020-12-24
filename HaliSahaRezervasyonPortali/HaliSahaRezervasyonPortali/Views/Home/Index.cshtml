@@ -1,0 +1,670 @@
+﻿@{
+    ViewBag.Title = "Rezervasyon";
+}
+
+
+<script type="text/javascript">
+    document.getElementById("li1").className = "active";
+    document.getElementById("li2").className = "";
+    document.getElementById("li3").className = "";
+    var tarih = "", saat = "", stadId = "", stadName = "", aciklama = "", servicePrice = 0, matchPrice = 0;
+    //bu metod ilgili tarih saat ve stad a göre maç bilgilerini ve gerekli tasarım kodlarını içerir.
+    function Goster() {
+        var rezervasyonlar = new Object();
+        tarih = document.getElementById("theDate").value;
+        var stad = document.getElementById("stadlar");
+        stadName = stad.options[stad.selectedIndex].text;
+        stadId = stad.value;
+        var today = new Date();
+        var gun = today.getDate();
+        var ay = today.getMonth();
+        var yil = today.getFullYear();
+        ay++;
+        if (gun < 10) gun = "0" + gun;
+        if (tarih == "" || tarih == undefined || tarih == null || new Date(tarih) < new Date(yil + "-" + ay + "-" + gun))
+        {
+            bootbox.alert({
+                title: "Tarih",
+                message: "Tarih Alanı Doğru Seçilmemiş!"
+            });
+            document.getElementById("panel").innerHTML = "";//daha önceki butonları silmek için
+        }
+        else if (stadId == "" || stadId == undefined || stadId == null) {
+            bootbox.alert({
+                title: "Stad",
+                message: "Stad Alanı Doğru Seçilmemiş!"
+            });
+            document.getElementById("panel").innerHTML = "";//daha önceki butonları silmek için
+        }
+        else if (stadName == "" || stadName == undefined || stadName == null) {
+            bootbox.alert({
+                title: "Stad Adı",
+                message: "Stad Adı Alınamadı,Lütfen Tekrar Deneyiniz!"
+            });
+            document.getElementById("panel").innerHTML = "";//daha önceki butonları silmek için
+        }
+        else {
+            var dialog = bootbox.dialog({
+                title: 'Lütfen Bekleyin',
+                message: '<p><i class="fa fa-spin fa-spinner"></i> Yükleniyor...</p>'
+            });
+
+            dialog.init(function () {
+                setTimeout(function () {
+                    dialog.modal('hide');
+                }, 1000);
+            });
+
+            $.ajax({//rezervasyon yapılan saatleri global bir değişkende saklıyoruz.
+                url: '/Home/MacSaatleriniGetir/',
+                type: "Post",
+                dataType: 'json',
+                async: false,
+                data: { matchDate: document.getElementById("theDate").value, stadiumId: document.getElementById("stadlar").value },
+                success: function (gelenDeg) {
+                    if (gelenDeg == "404") {
+                        bootbox.alert({
+                            title: "Bilgi",
+                            message: "Maç Saatleri Listelenemedi!"
+                        });
+                        document.getElementById("panel").innerHTML = "";//daha önceki butonları silmek için
+                    }
+                    else {
+                        rezervasyonlar = gelenDeg;
+                    }
+                },
+                error: function (err) {
+                }
+            });
+
+            $.ajax({//rezervasyon saatlerini aldıktan sonra veritabanında kayıtlı maç saatlerine göre butonlar oluşturuluyor ve ardından ilgili maç için rezervasyon yapılmışsa o buton disable yapılıyor.
+                url: '/Home/SaatleriGetir/',
+                type: "Post",
+                dataType: 'json',
+                async: false,
+                success: function (gelenDeg) {
+                    if (gelenDeg == "404") {
+                        bootbox.alert({
+                            title: "Bilgi",
+                            message: "Maç Saatleri Listelenemedi!"
+                        });
+                    }
+                    else {
+                        document.getElementById("panel").innerHTML = "";//daha önceki butonları silmek için
+                        var data = gelenDeg;
+                        var sayac = 0;
+                        data.forEach(function (item) {
+                            var data2 = item;
+                            var btn = document.createElement("button");
+                            btn.setAttribute("id", "btn" + sayac.toString());
+                            btn.setAttribute("name", "btn" + sayac.toString());
+                            btn.innerText = data2.startTime + " - " + data2.stopTime;
+                            btn.style.cssText = "margin:5px 5px 5px 5px";
+
+                            var flag = new Boolean(false);//false ise ilgili saatte rezervasyon yoktur, true ise ilgili saate rezervasyon yapmılmıştır.
+                            rezervasyonlar.forEach(function (item2) {
+                                if (item2.matchStart == data2.startTime) {
+                                    flag = true;
+                                }
+                            });
+                            if (data2.status == false) {
+                                btn.className = "btn btn-warning";
+                            }
+                            else if (flag == true) {
+                                btn.className = "btn btn-primary";
+
+                            }
+                            else {
+                                btn.className = "btn btn-success";
+                            }
+
+                            sayac++;
+                            if (flag == true || data2.status == false) {
+                                btn.onclick = function () {
+                                    //ilgili saate rezervasyon alınamıyorsa yada ilgili saatte daha önceden alınmış rezervasyon varsa tıklama olayı boş olacaktır.
+                                }
+                            }
+                            else {
+                            btn.onclick = function () {
+                                var mail = '@Session["mail"]';
+                                var sifre = '@Session["sifre"]';
+                                if (mail == null || mail == "" || sifre == null || sifre == "")
+                                    $("#loginModal").modal('toggle');
+                                else {
+                                    $("#odemeModal").modal('toggle');
+                                    matchPrice = data2.matchPrice;
+                                    servicePrice = data2.servicePrice;
+                                    saat = data2.startTime + "-" + data2.stopTime;
+
+                                    document.getElementById('rtarih').innerHTML = "<i class='fa fa-calendar'></i> " + tarih;
+                                    document.getElementById('rsaat').innerHTML = "<i class='fa fa-clock-o'></i> " + saat;
+                                    document.getElementById('rstad').innerHTML = "<i class='fa fa-futbol-o'></i> " + stadName;
+                                    document.getElementById('lblServis').innerHTML = "<i class='fa fa-taxi'></i> Servis(+" + servicePrice + ") <input type='checkbox' id='rservis' onchange='ServisFiyatiGuncelle()'>";
+                                    document.getElementById('stadiumPrice').innerHTML = matchPrice + " TL";
+                                    document.getElementById('servicePrice').innerHTML = "0 TL";
+                                    document.getElementById('totalPrice').innerHTML = matchPrice + " TL";
+                                }
+
+                            }
+                        }
+                            var panelDiv = document.getElementById("panel");
+                            panelDiv.appendChild(btn);
+                        });
+
+                    }
+                },
+                error: function (err) {
+                    hatalar = gelenDeg;
+                }
+            });
+        }
+    }
+    //bu metod stad isimlerini ve id lerini select list'e aktarır.
+    function stadlariGetir() {
+        $.ajax({
+            url: '/Home/Stadlar/',
+            type: "Post",
+            dataType: 'json',
+            async: false,
+            success: function (gelenDeg) {
+                if (gelenDeg == "404") {
+                    alert('Stadlar Listelenemedi!');
+                }
+                else {
+                    gelenDeg.forEach(function (item) {
+                        var select = document.getElementById("stadlar");
+                        var option = document.createElement("option");
+                        option.text = item.stadiumName;
+                        option.value = item._id;
+                        select.add(option);
+                    });
+
+                }
+            },
+            error: function (err) {
+            }
+        });
+        var today = new Date();
+        var gun = today.getDate();
+        var ay = today.getMonth();
+        var yil = today.getFullYear();
+        ay++;
+        if (gun < 10) gun = "0" + gun;
+        document.getElementById("theDate").value = yil + "-" + ay + "-" + gun;
+        Goster();
+    }
+    //bu metod kullanıcının oturum açması için kullanılır.
+    function Login() {
+        if (document.getElementById("mail").value == "" || document.getElementById("password").value == "") {
+            document.getElementById("mesaj").style.color = "red";
+            document.getElementById("mesaj").innerHTML = "Alanlar Boş Geçilemez";
+        }
+        else {
+            $.ajax({
+                url: '/Home/Login/',
+                type: "Post",
+                dataType: 'json',
+                async: false,
+                data: { mailAdress: document.getElementById("mail").value, password: document.getElementById("password").value },
+                success: function (gelenDeg) {
+                    if (gelenDeg == "404") {
+                        document.getElementById("mesaj").style.color = "red";
+                        document.getElementById("mesaj").innerHTML = "Tekrar Deneyiniz.";
+                    }
+                    else {
+                        document.getElementById("mesaj").style.color = "green";
+                        document.getElementById("mesaj").innerHTML = "İşlem Başarılı.";
+                        setInterval(function () {
+                            window.location.reload(false);
+                        }, 1000);
+                    }
+                },
+                error: function (err) {
+                    hatalar = gelenDeg;
+                }
+            });
+        }
+    }
+    //bu metod kullanıcının oturum kapatması için kullanılır.
+    function Logout() {
+        $.ajax({
+            url: '/Home/Logout/',
+            type: "Post",
+            dataType: 'json',
+            async: false,
+            success: function (gelenDeg) {
+                if (gelenDeg == "200") {
+                    setInterval(function () {
+                        window.location.reload(false);
+                    }, 1000);
+                }
+                else {
+
+                }
+            },
+            error: function (err) {
+            }
+        });
+    }
+    //bu metod global değişkenlerin içini temizler.
+    function Temizle() {
+        tarih = "", saat = "", stadId = "", aciklama = "", servicePrice = 0, stadPrice = 0;
+    }
+    //bu metod kullanıcı servis seçeneğini değiştirdiği anda tetiklenir ve anlık fiyat bilgilerini yansıtır.
+    function ServisFiyatiGuncelle() {
+        var cbxKontrol = document.getElementById('rservis');
+        if (cbxKontrol.checked == true) {
+            document.getElementById('servicePrice').innerHTML = servicePrice + " TL";
+            document.getElementById('totalPrice').innerHTML = matchPrice + servicePrice + " TL";
+        }
+        else {
+            document.getElementById('servicePrice').innerHTML = "0 TL";
+            document.getElementById('totalPrice').innerHTML = matchPrice + " TL";
+        }
+    }
+    //bu metod ödeme işlemi başarılı ise yeni bir maç kaydı oluşturur.
+    function OdemeOnay() {
+        var service = new Boolean();
+        var total = 0;
+        var cbxKontrol = document.getElementById('rservis');
+        if (cbxKontrol.checked == true) {
+            service = true;
+            total = servicePrice + matchPrice;
+        }
+        else {
+            service = false;
+            total = matchPrice;
+        }
+        aciklama = document.getElementById('raciklama').value;
+        $.ajax({
+            url: '/Home/OdemeYap/',
+            type: "Post",
+            dataType: 'json',
+            async: false,
+            data: {
+                service: service, matchDate
+                    : tarih, stadiumId: stadId, matchStart: saat.split('-')[0], matchStop: saat.split('-')[1], note: aciklama, totalPrice: total
+            },
+            success: function (gelenDeg) {
+                if (gelenDeg == "200") {
+                        window.location.href = "/Home/Mac";
+                }
+                else {
+                    bootbox.alert({
+                        title: "Hata",
+                        message: "Ödeme İşlemi Başarısız!"
+                    });
+                }
+            },
+            error: function (err) {
+
+            }
+        });
+    }
+    //bu metod yeni bir kullanıcı oluşturur.
+    function YeniKullanici() {
+        var error = new Boolean(false);
+        var name, surName, mail, phone, password;
+        name = document.getElementById("userName").value;
+        surName = document.getElementById("userSurname").value;
+        mail = document.getElementById("userMail").value;
+        phone = document.getElementById("userPhone").value;
+        password = document.getElementById("userPassword").value;
+        if (password.length<6) {
+            document.getElementById("passwordMesaj").style.display = "block";
+            error = true;
+        }
+        else {
+            document.getElementById("passwordMesaj").style.display = "none";
+            error = false;
+        }
+        if (name == "" || surName=="") {
+            document.getElementById("nameMesaj").style.display = "block";
+            error = true;
+        }
+        else {
+            document.getElementById("nameMesaj").style.display = "none";
+            error = false;
+        }
+        if (mail == "") {
+            document.getElementById("mailMesaj").style.display = "block";
+            document.getElementById("mailMesaj").value = "Boş Geçilemez";
+            error = true;
+        }
+        else {
+            document.getElementById("mailMesaj").style.display = "none";
+            error = false;
+        }
+        if (phone.length != 10) {
+            document.getElementById("phoneMesaj").style.display = "block";
+            error = true;
+        }
+        else {
+            document.getElementById("phoneMesaj").style.display = "none";
+            error = false;
+        }
+        if (error == false) {//error false ise bütün alanlar doğru girilmiştir.
+            $.ajax({
+                url: '/Home/YeniKullanici/',
+                type: "Post",
+                dataType: 'json',
+                async: false,
+                data: { nameAndSurname: name + " " + surName, mailAdress: mail, password: password, phoneNumber: phone, role:"U" },
+                success: function (gelenDeg) {
+                    if (gelenDeg == "200") {//yeni kullanıcı oluşturuldu ve oturum açıldı.
+                        setInterval(function () {
+                            window.location.reload(false);
+                        }, 1000);
+
+                    }
+                    else if (gelenDeg == "205") {//veriler uygun formatta ancak mail daha önce kullanılmış
+                        document.getElementById("mailMesaj").value = "Bu Mail Mevcut";
+                        document.getElementById("mailMesaj").style.display = "block";
+                        document.getElementById("singUpMesaj").innerHTML = "";
+                    }
+                    else {//sunucu kaynaklı hata oluştu
+                        document.getElementById("singUpMesaj").innerHTML = "Sunucu Kaynaklı Bir Hata Oluştu!";
+                        document.getElementById("mailMesaj").style.display = "none";
+                    }
+                },
+                error: function (err) {
+                }
+            });
+        }
+    }
+</script>
+<style>
+    /*body {
+        font-family: Arial;
+        font-size: 17px;
+        padding: 8px;
+    }*/
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .row {
+        display: -ms-flexbox; /* IE10 */
+        display: flex;
+        -ms-flex-wrap: wrap; /* IE10 */
+        flex-wrap: wrap;
+        margin: 0 -16px;
+    }
+
+    .col-25 {
+        -ms-flex: 25%; /* IE10 */
+        flex: 25%;
+    }
+
+    .col-50 {
+        -ms-flex: 50%; /* IE10 */
+        flex: 50%;
+    }
+
+    .col-75 {
+        -ms-flex: 75%; /* IE10 */
+        flex: 75%;
+    }
+
+    .col-25,
+    .col-50,
+    .col-75 {
+        padding: 0 16px;
+    }
+
+    /*.container {
+        background-color: #f2f2f2;
+        padding: 5px 20px 15px 20px;
+        border: 1px solid lightgrey;
+        border-radius: 3px;
+    }*/
+
+    input[type=text] {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    input[type=password] {
+        width: 100%;
+        margin-bottom: 20px;
+        padding: 12px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    label {
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .icon-container {
+        margin-bottom: 20px;
+        padding: 7px 0;
+        font-size: 24px;
+    }
+
+    /*.btn {
+        background-color: #4CAF50;
+        color: white;
+        padding: 12px;
+        margin: 10px 0;
+        border: none;
+        width: 100%;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 17px;
+    }*/
+
+    /* .btn:hover {
+            background-color: #45a049;
+        }*/
+
+    /* a {
+        color: #2196F3;
+    }*/
+
+    /*hr {
+        border: 1px solid lightgrey;
+    }*/
+
+    span.price {
+        float: right;
+        color: grey;
+    }
+</style>
+<body onload="stadlariGetir()">
+    <div class="jumbotron">
+        <h2>Online Halı Saha Rezervasyon Portalına Hoş Geldiniz.</h2>
+    </div>
+
+    @*---------------------------Login Modal-----------------------------------*@
+    <div class="modal fade" id="loginModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Oturum Aç</h4>
+                </div>
+                <div class="modal-body">
+                    <label for="mail"><i class="fa fa-user"></i> Mail Adresi</label>
+                    <input type="text" id="mail" name="mail" placeholder="birisi@example.com">
+                    <label for="password"><i class="fa fa-user"></i> Şifre</label>
+                    <input type="password" id="password" name="password" placeholder="******">
+                    <label style="color:red; font:bold" id="mesaj"></label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="Login()">Giriş Yap</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    @*---------------------------End Login Modal------------------------*@
+    @*-----------------------------Ödeme Modal--------------------------*@
+    <div class="modal fade" id="odemeModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" onclick="Temizle()">&times;</button>
+                    <h4 class="modal-title">Ödeme İşlemi</h4>
+                </div>
+                <div class="modal-body">
+                    @*----------------------Ödeme Sayfası Kodları------------*@
+                    <div class="row">
+
+                        <div class="container">
+                            <form>
+                                <div class="row">
+                                    <div class="col-50">
+                                        <h3>Rezervasyon Bilgileri</h3>
+                                        <label id="rtarih"></label>
+                                        <label id="rsaat"></label>
+                                        <label id="rstad"></label>
+                                        <label id="lblServis" for="rservis"></label>
+                                        <label><i class="fa fa-comment"></i> Açıklama</label>
+                                        <textarea id="raciklama" rows="11" cols="30" placeholder="Buraya rezervasyon ve servis ile ilgili eklemek istediklerinizi yazınız"></textarea>
+                                        <hr style="border:1px solid gray;" />
+                                    </div>
+
+                                    <div class="col-50">
+                                        <h3>Ödeme Bilgileri</h3>
+                                        <label>Geçerli Kartlar</label>
+                                        <div class="icon-container">
+                                            <i class="fa fa-cc-visa" style="color:navy;"></i>
+                                            <i class="fa fa-cc-amex" style="color:blue;"></i>
+                                            <i class="fa fa-cc-mastercard" style="color:red;"></i>
+                                            <i class="fa fa-cc-discover" style="color:orange;"></i>
+                                        </div>
+                                        <label for="cname">Kart Sahininin Adı ve Soyadı</label>
+                                        <input type="text" id="cname" name="cardname" placeholder="Mehmet Kanyılmaz">
+                                        <label for="ccnum">Kart Numarası</label>
+                                        <input type="text" id="ccnum" name="cardnumber" placeholder="1111-2222-3333-4444">
+                                        <label for="expmonth">Son Kullanma Ay/Yıl</label>
+                                        <input type="text" id="expmonth" placeholder="10/2020">
+                                        <hr style="border:1px solid gray;" />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-25">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-25"><h4>Ürünleriniz</h4></div>
+                                <div class="col-50"><i class="fa fa-shopping-cart"></i></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-25">Stad</div>
+                                <div class="col-50"><label id="stadiumPrice"></label></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-25">Servis</div>
+                                <div class="col-50"><label id="servicePrice"></label></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-25">Toplam</div>
+                                <div class="col-50"><label id="totalPrice"></label></div>
+                            </div>
+                        </div>
+                    </div>
+                    @*--------------------End Ödeme Sayfası Kodları----------------------*@
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="OdemeOnay()">Onayla</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="Temizle()">Kapat</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    @*-------------------------End Ödeme Modal---------------------------*@
+    @*---------------------------Sign Up Modal-----------------------------------*@
+    <div class="modal fade" id="signUpModal" role="dialog">
+        <div class="modal-dialog">
+
+            Modal content
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Yeni Hesap Oluştur</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="form-group col-lg-12">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    <input type="text" id="userName" placeholder="İsim" class="form-control">
+                                    <input type="text" id="userSurname" placeholder="Soyisim" class="form-control">
+                                    <input type="text" id="nameMesaj" style="display:none" value="Boş Geçilemez" class="form-control alert-danger">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-12">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                                    <input type="text" id="userMail" placeholder="birisi@example.com" class="form-control">
+                                    <input type="text" id="mailMesaj" style="display:none" value="Boş Geçilemez" class="form-control alert-danger">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-12">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-phone-square"></i></span>
+                                    <input type="text" id="userPhone" placeholder="537XXXXXXX" class="form-control">
+                                    <input type="text" id="phoneMesaj" style="display:none" value="10 Haneli Olmalı" class="form-control alert-danger">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-12">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-unlock-alt"></i></span>
+                                    <input type="password" id="userPassword" placeholder="******" class="form-control">
+                                    <input type="text" id="passwordMesaj" style="display:none" value="En Az 6 Haneli Olmalı" class="form-control alert-danger">
+                                </div>
+                            </div>
+                        </div>
+                        <label style="color:red; font:bold" id="singUpMesaj"></label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="YeniKullanici()">Kaydol</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Kapat</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    @*---------------------------End Sign Up Modal------------------------*@
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-xs-12 table-bordered" style="border-radius: 15px;">
+            <h4 class="text-center">Tarih Ve Stad Seçiniz</h4>
+            <div class="col-lg-12 col-xs-12" style="padding:10px 0px 5px 0px;">
+                <input type="date" id="theDate" class="form-control">
+            </div>
+            <div class="col-lg-12 col-xs-12" style="padding:5px 0px 5px 0px;width:100%">
+                <select class="form-control" id="stadlar">
+                </select>
+            </div>
+            <div class="col-lg-12 col-xs-12" style="padding:5px 0px 10px 0px;">
+                <a href="#" class="btn btn-success btn-block" onclick="Goster()">Göster</a>
+            </div>
+        </div>
+        <div class="col-lg-8 col-xs-12 table-bordered" style="border-radius:15px; margin-left:5px" id="panel"></div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col-lg-4"><a href="#" class="btn btn-warning btn-block">Kapalı</a></div>
+        <div class="col-lg-4"><a href="#" class="btn btn-primary btn-block">Maç Var</a></div>
+        <div class="col-lg-4"><a href="#" class="btn btn-success btn-block">Boş</a></div>
+    </div>
+</div>
+</body>

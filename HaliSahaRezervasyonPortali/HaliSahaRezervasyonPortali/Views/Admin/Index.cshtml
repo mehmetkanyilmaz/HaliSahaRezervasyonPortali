@@ -1,0 +1,68 @@
+﻿@model HaliSahaRezervasyonPortali.Models.userModel
+@{
+    Layout = null;
+}
+@*Bu sayfada kullanıcı sisteme giriş yapar.*@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <style>
+        .row{
+            padding-bottom:10px;
+            font:bold 15px arial;
+        }
+        .baslik{
+            font:bold 17px arial;
+            text-align:center;
+            padding:5px 0px 15px 0px;
+        }
+        .kutu {
+            -webkit-box-shadow: 0px 0px 25px 5px rgba(0,0,0,0.75);
+            -moz-box-shadow: 0px 0px 25px 5px rgba(0,0,0,0.75);
+            box-shadow: 0px 0px 25px 5px rgba(0,0,0,0.75);
+            border-radius:7px;
+        }
+        input[type=text], input[type=password] {
+            width: 100%;
+            /*  margin-bottom: 10px;*/
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        .yazi{
+            padding:6px;
+        }
+    </style>
+</head>
+<body>
+    @using (Html.BeginForm("Index", "Admin", FormMethod.Post, new { @class = "" }))
+    {
+    <div class="container  table-bordered kutu" style="width:400px;margin-top:7%">
+        <div class="row">
+            <div class="col-md-12 baslik">Admin Paneli Giriş Sayfası</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 yazi">Mail</div>
+            <div class="col-md-10">@Html.TextBoxFor(x => x.mailAdress, new { placeholder = "Mail Adresi" })</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 yazi">Şifre</div>
+            <div class="col-md-10">@Html.TextBoxFor(x => x.password, new { type = "password", placeholder = "Şifre" })</div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">@ViewBag.mesaj</div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12"><button type="submit" class="btn btn-block btn-success" style="font:bold 15px arial;">Giriş Yap</button></div>
+
+        </div>
+    </div>
+    }
+</body>
+</html>
