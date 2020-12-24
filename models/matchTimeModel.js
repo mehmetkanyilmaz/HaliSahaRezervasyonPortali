@@ -18,7 +18,7 @@ const MatchTimeSchema=new Schema({
     },
     status:{//false ise ilgili saate maç rezervasyonu yapılamaz.
         type:Boolean,
-        default:true
+        default:false
     }
 },{collation:'matchTime'})
 
