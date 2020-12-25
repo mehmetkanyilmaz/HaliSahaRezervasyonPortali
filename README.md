@@ -1,4 +1,5 @@
-# Halı Saha Rezervasyon Portali ![alt text](http://url/to/img.png)
+![](https://github.com/mehmetkanyilmaz/HaliSahaRezervasyonPortali/blob/master/frontend/HaliSahaRezervasyonPortali/images/logo.png) 
+# Halı Saha Rezervasyon Portali 
 ## Uygulamanın Amacı
 Kullanıcıya online olarak halı saha sistemine rezervasyon oluşturmak. Admin panelinde ise rezervasyonları ve halı sayayı yönetmektir. Aynı zamanda admin paneli alınan rezervasyonlarla ilgili bir analiz sunmaktadır.
 
